@@ -1,5 +1,3 @@
-import { ErrorCorrectionLevel } from "@/types/qr";
-
 const hexToRgb = (hex: string) => {
   const normalized = hex.replace("#", "");
   if (normalized.length !== 6) return null;
@@ -37,20 +35,8 @@ export const readabilityLabel = (ratio: number): string => {
   return "Riesgo alto";
 };
 
-export const logoSizePercent = (level: ErrorCorrectionLevel, scale = 1): number => {
-  const safeScale = Math.min(Math.max(scale, 0.6), 3);
-  const clamp = (value: number) => Math.min(Math.max(value, 0.12), 0.5);
-
-  switch (level) {
-    case "H":
-      return clamp(0.24 * safeScale);
-    case "Q":
-      return clamp(0.2 * safeScale);
-    case "M":
-      return clamp(0.18 * safeScale);
-    case "L":
-      return clamp(0.16 * safeScale);
-    default:
-      return clamp(0.18 * safeScale);
-  }
+export const logoSizePercent = (scale = 1): number => {
+  const safeScale = Math.min(Math.max(scale, 0.6), 3.2);
+  const value = 0.18 * safeScale;
+  return Math.min(Math.max(value, 0.12), 0.45);
 };

@@ -233,15 +233,18 @@ export default function HomePage() {
                 <input
                   type="range"
                   min={60}
-                  max={300}
+                  max={320}
                   step={5}
                   value={Math.round(style.logoScale * 100)}
                   onChange={(e) => setStyle({ ...style, logoScale: Number(e.target.value) / 100 })}
                   className="mt-2 block w-full"
                 />
-                {style.logoScale > 2 ? (
+                <span className="mt-1 block text-xs text-slate-500">
+                  El tamaño del QR no cambia. Solo se ajusta el tamaño del logo en el centro.
+                </span>
+                {style.logoScale > 2.4 ? (
                   <span className="mt-1 block text-xs text-amber-700">
-                    Tamaños muy altos pueden dificultar el escaneo en algunos lectores.
+                    Tamaños muy altos del logo pueden impedir el escaneo en algunos lectores.
                   </span>
                 ) : null}
               </label>
