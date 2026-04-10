@@ -45,5 +45,6 @@ export const defaultStyleConfig: QrStyleConfig = {
   dotsStyle: "square",
   cornerSquareStyle: "square",
   cornerDotStyle: "square",
+  centerLogoUrl: "",
   errorCorrectionLevel: "M"
 };

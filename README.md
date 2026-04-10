@@ -12,6 +12,7 @@ Generador de códigos QR gratuito, personalizable y de alta calidad, creado para
 - Personalización visual avanzada:
   - Estilo de módulos, color principal y fondo
   - Gradiente y fondo transparente
+  - Inserción de logo central opcional con tamaño fijo del 50% para mantener consistencia visual
   - Nivel de corrección de errores (L, M, Q, H)
 - Exportación en alta calidad:
   - PNG y SVG

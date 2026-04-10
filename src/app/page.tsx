@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Download, QrCode, Sparkles } from "lucide-react";
 import { defaultFormValues, defaultStyleConfig } from "@/lib/qr/defaults";
-import { exportQr, mountQr } from "@/lib/qr/exporters";
+import { canLoadLogo, exportQr, mountQr } from "@/lib/qr/exporters";
 import { buildPayload } from "@/lib/qr/payloadBuilders";
 import { stylePresets } from "@/lib/qr/presets";
 import { qrTemplates } from "@/lib/qr/templates";
@@ -36,6 +36,7 @@ export default function HomePage() {
   const [style, setStyle] = useState<QrStyleConfig>(defaultStyleConfig);
   const [exportSize, setExportSize] = useState(2000);
   const [printMode, setPrintMode] = useState(false);
+  const [logoWarning, setLogoWarning] = useState("");
   const [utm, setUtm] = useState<UtmValues>({
     baseUrl: values.link,
     source: "",
@@ -45,20 +46,59 @@ export default function HomePage() {
     content: ""
   });
   const previewRef = useRef<HTMLDivElement>(null);
+  const resolveLogoUrl = (raw: string) => {
+    if (!raw) return "";
+    if (raw.startsWith("data:") || raw.startsWith("blob:")) return raw;
+    try {
+      const parsed = new URL(raw);
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return "";
+      return `/api/logo-proxy?url=${encodeURIComponent(parsed.toString())}`;
+    } catch {
+      return "";
+    }
+  };
 
   const payload = useMemo(() => buildPayload(type, values), [type, values]);
   const ratio = useMemo(() => contrastRatio(style.dotsColor, style.backgroundColor), [style.dotsColor, style.backgroundColor]);
 
   useEffect(() => {
     if (!previewRef.current) return;
-    previewRef.current.innerHTML = "";
-    mountQr(payload || " ", style, previewRef.current, 420, printMode ? 14 : 2);
+    let cancelled = false;
+    const draw = async () => {
+      if (!previewRef.current) return;
+      previewRef.current.innerHTML = "";
+
+      if (style.centerLogoUrl) {
+        const safeLogoUrl = resolveLogoUrl(style.centerLogoUrl);
+        const canUseLogo = await canLoadLogo(safeLogoUrl);
+        if (cancelled) return;
+
+        if (!canUseLogo) {
+          setLogoWarning("No se pudo cargar el logo desde esa URL. El código se muestra sin logo para mantener su lectura.");
+          mountQr(payload || " ", { ...style, centerLogoUrl: "" }, previewRef.current, 420, printMode ? 14 : 2);
+          return;
+        }
+
+        setLogoWarning("");
+        mountQr(payload || " ", { ...style, centerLogoUrl: safeLogoUrl }, previewRef.current, 420, printMode ? 14 : 2);
+        return;
+      }
+
+      setLogoWarning("");
+      mountQr(payload || " ", style, previewRef.current, 420, printMode ? 14 : 2);
+    };
+
+    void draw();
+    return () => {
+      cancelled = true;
+    };
   }, [payload, style, printMode]);
 
   const updateValue = (key: keyof QrFormValues, value: string) => setValues((prev) => ({ ...prev, [key]: value }));
 
   const doExport = async (ext: "png" | "svg") => {
-    await exportQr(payload, style, exportSize, ext, `obenus-qr-${type}`, printMode ? 28 : 4);
+    const safeLogoUrl = resolveLogoUrl(style.centerLogoUrl);
+    await exportQr(payload, { ...style, centerLogoUrl: safeLogoUrl }, exportSize, ext, `obenus-qr-${type}`, printMode ? 28 : 4);
   };
 
   const applyTemplate = (templateId: string) => {
@@ -178,6 +218,18 @@ export default function HomePage() {
                   <option value="Q">Q</option>
                   <option value="H">H</option>
                 </select>
+              </label>
+              <label className="text-sm">
+                Logo central (URL)
+                <input
+                  type="url"
+                  value={style.centerLogoUrl}
+                  onChange={(e) => setStyle({ ...style, centerLogoUrl: e.target.value })}
+                  placeholder="https://..."
+                  className="mt-1 w-full rounded-lg border border-slate-300 p-2"
+                />
+                <span className="mt-1 block text-xs text-slate-500">El logo se aplica con un tamaño fijo del 50% del ancho del QR.</span>
+                {logoWarning ? <span className="mt-1 block text-xs text-amber-700">{logoWarning}</span> : null}
               </label>
               <label className="text-sm">
                 Tamaño de exportación

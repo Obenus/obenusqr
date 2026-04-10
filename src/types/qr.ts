@@ -66,6 +66,7 @@ export interface QrStyleConfig {
   dotsStyle: DotStyle;
   cornerSquareStyle: CornerSquareStyle;
   cornerDotStyle: CornerDotStyle;
+  centerLogoUrl: string;
   errorCorrectionLevel: ErrorCorrectionLevel;
 }
 
