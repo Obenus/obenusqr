@@ -270,7 +270,12 @@ export default function HomePage() {
             <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold">
               <QrCode size={18} /> Vista previa
             </h2>
-            <div ref={previewRef} className="zona-vista-previa mx-auto flex min-h-[430px] items-center justify-center rounded-2xl bg-white p-3" />
+            <div
+              ref={previewRef}
+              className={`zona-vista-previa mx-auto flex min-h-[430px] items-center justify-center rounded-2xl p-3 ${
+                style.backgroundTransparent ? "" : "bg-white"
+              }`}
+            />
             <p className="mt-3 text-sm text-slate-600">
               Contraste: <strong>{ratio.toFixed(2)}:1</strong> - {readabilityLabel(ratio)}
             </p>

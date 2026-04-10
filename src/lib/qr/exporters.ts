@@ -30,6 +30,7 @@ export const canLoadLogo = (url: string, timeoutMs = 4500): Promise<boolean> =>
   });
 
 const buildQrInstance = (payload: string, style: QrStyleConfig, size: number, margin = 0, withLogo = true) =>
+  // Use explicit RGBA alpha for reliable transparency in preview/export.
   new QRCodeStyling({
     width: size,
     height: size,
@@ -68,7 +69,7 @@ const buildQrInstance = (payload: string, style: QrStyleConfig, size: number, ma
       color: style.cornerDotColor
     },
     backgroundOptions: {
-      color: style.backgroundTransparent ? "transparent" : style.backgroundColor
+      color: style.backgroundTransparent ? "rgba(0,0,0,0)" : style.backgroundColor
     }
   });
 
