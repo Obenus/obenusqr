@@ -49,6 +49,35 @@ npm run build
 npm run start
 ```
 
+## Uso con Docker
+
+Puedes desplegar la aplicación en cualquier servidor con Docker de forma rápida.
+
+### Construir y ejecutar con Docker Compose
+
+```bash
+docker compose up -d --build
+```
+
+La aplicación quedará disponible en:
+
+- [http://localhost:3025](http://localhost:3025)
+
+### Detener contenedor
+
+```bash
+docker compose down
+```
+
+### Actualizar a una versión nueva
+
+```bash
+git fetch --tags
+git checkout v1.0
+docker compose down
+docker compose up -d --build
+```
+
 ## Seguridad aplicada
 
 Se añadieron medidas de endurecimiento base:

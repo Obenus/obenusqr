@@ -1,0 +1,12 @@
+services:
+  obenusqr:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: obenusqr
+    restart: unless-stopped
+    ports:
+      - "3025:3025"
+    environment:
+      NODE_ENV: production
+      PORT: 3025
