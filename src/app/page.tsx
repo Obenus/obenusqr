@@ -229,6 +229,18 @@ export default function HomePage() {
                 {logoWarning ? <span className="mt-1 block text-xs text-amber-700">{logoWarning}</span> : null}
               </label>
               <label className="text-sm">
+                Tamaño del logo ({Math.round(style.logoScale * 100)}%)
+                <input
+                  type="range"
+                  min={60}
+                  max={190}
+                  step={5}
+                  value={Math.round(style.logoScale * 100)}
+                  onChange={(e) => setStyle({ ...style, logoScale: Number(e.target.value) / 100 })}
+                  className="mt-2 block w-full"
+                />
+              </label>
+              <label className="text-sm">
                 Tamaño de exportación
                 <select value={exportSize} onChange={(e) => setExportSize(Number(e.target.value))} className="mt-1 w-full rounded-lg border border-slate-300 bg-white p-2">
                   <option value={2000}>2000 px</option>

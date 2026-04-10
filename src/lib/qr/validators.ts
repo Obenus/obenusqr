@@ -37,17 +37,20 @@ export const readabilityLabel = (ratio: number): string => {
   return "Riesgo alto";
 };
 
-export const logoSizePercent = (level: ErrorCorrectionLevel): number => {
+export const logoSizePercent = (level: ErrorCorrectionLevel, scale = 1): number => {
+  const safeScale = Math.min(Math.max(scale, 0.6), 1.9);
+  const clamp = (value: number) => Math.min(Math.max(value, 0.12), 0.35);
+
   switch (level) {
     case "H":
-      return 0.23;
+      return clamp(0.25 * safeScale);
     case "Q":
-      return 0.2;
+      return clamp(0.22 * safeScale);
     case "M":
-      return 0.17;
+      return clamp(0.2 * safeScale);
     case "L":
-      return 0.14;
+      return clamp(0.18 * safeScale);
     default:
-      return 0.17;
+      return clamp(0.2 * safeScale);
   }
 };

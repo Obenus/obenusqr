@@ -45,7 +45,7 @@ const buildQrInstance = (payload: string, style: QrStyleConfig, size: number, ma
     imageOptions: {
       crossOrigin: "anonymous",
       margin: 8,
-      imageSize: logoSizePercent(style.errorCorrectionLevel)
+      imageSize: logoSizePercent(style.errorCorrectionLevel, style.logoScale)
     },
     dotsOptions: {
       type: style.dotsStyle,
