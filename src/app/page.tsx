@@ -46,6 +46,17 @@ export default function HomePage() {
     content: ""
   });
   const previewRef = useRef<HTMLDivElement>(null);
+  const resolveLogoUrl = (raw: string) => {
+    if (!raw) return "";
+    if (raw.startsWith("data:") || raw.startsWith("blob:")) return raw;
+    try {
+      const parsed = new URL(raw);
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return "";
+      return `/api/logo-proxy?url=${encodeURIComponent(parsed.toString())}`;
+    } catch {
+      return "";
+    }
+  };
 
   const payload = useMemo(() => buildPayload(type, values), [type, values]);
   const ratio = useMemo(() => contrastRatio(style.dotsColor, style.backgroundColor), [style.dotsColor, style.backgroundColor]);
@@ -58,13 +69,17 @@ export default function HomePage() {
       previewRef.current.innerHTML = "";
 
       if (style.centerLogoUrl) {
-        const canUseLogo = await canLoadLogo(style.centerLogoUrl);
+        const safeLogoUrl = resolveLogoUrl(style.centerLogoUrl);
+        const canUseLogo = await canLoadLogo(safeLogoUrl);
         if (cancelled) return;
         if (!canUseLogo) {
           setLogoWarning("No se pudo cargar el logo desde esa URL. El código se muestra sin logo para mantener su lectura.");
           mountQr(payload || " ", { ...style, centerLogoUrl: "" }, previewRef.current, 420, printMode ? 14 : 2);
           return;
         }
+        setLogoWarning("");
+        mountQr(payload || " ", { ...style, centerLogoUrl: safeLogoUrl }, previewRef.current, 420, printMode ? 14 : 2);
+        return;
       }
 
       setLogoWarning("");
@@ -80,7 +95,8 @@ export default function HomePage() {
   const updateValue = (key: keyof QrFormValues, value: string) => setValues((prev) => ({ ...prev, [key]: value }));
 
   const doExport = async (ext: "png" | "svg") => {
-    await exportQr(payload, style, exportSize, ext, `obenus-qr-${type}`, printMode ? 28 : 4);
+    const safeLogoUrl = resolveLogoUrl(style.centerLogoUrl);
+    await exportQr(payload, { ...style, centerLogoUrl: safeLogoUrl }, exportSize, ext, `obenus-qr-${type}`, printMode ? 28 : 4);
   };
 
   const applyTemplate = (templateId: string) => {
