@@ -78,6 +78,56 @@ docker compose down
 docker compose up -d --build
 ```
 
+## Mantenimiento y actualizaciones
+
+Esta sección resume cómo mantener la aplicación actualizada en servidor VPS o entorno local.
+
+### Ver versión actual desplegada
+
+```bash
+git describe --tags --always
+docker compose ps
+```
+
+### Actualizar a la última versión estable etiquetada
+
+```bash
+git fetch --tags
+git checkout $(git tag --sort=-v:refname | head -n 1)
+docker compose up -d --build
+```
+
+### Actualizar a una versión concreta
+
+```bash
+git fetch --tags
+git checkout v1.0
+docker compose up -d --build
+```
+
+### Actualizar siguiendo la rama principal
+
+```bash
+git checkout main
+git pull origin main
+docker compose up -d --build
+```
+
+### Volver rápidamente a una versión anterior
+
+```bash
+git checkout v1.0
+docker compose up -d --build
+```
+
+### Comandos de comprobación tras actualizar
+
+```bash
+docker compose ps
+docker compose logs --tail=100 obenusqr
+curl -I http://127.0.0.1:3025
+```
+
 ## Seguridad aplicada
 
 Se añadieron medidas de endurecimiento base:
