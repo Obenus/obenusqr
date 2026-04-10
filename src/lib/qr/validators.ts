@@ -34,9 +34,3 @@ export const readabilityLabel = (ratio: number): string => {
   if (ratio >= 3) return "Riesgo medio";
   return "Riesgo alto";
 };
-
-export const logoSizePercent = (scale = 1): number => {
-  const safeScale = Math.min(Math.max(scale, 0.6), 3.2);
-  const value = 0.18 * safeScale;
-  return Math.min(Math.max(value, 0.12), 0.45);
-};

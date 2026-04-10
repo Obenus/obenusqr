@@ -11,7 +11,7 @@ Generador de códigos QR gratuito, personalizable y de alta calidad, creado para
   - Evento y Código de barras 2D
 - Personalización visual avanzada:
   - Estilo de módulos, color principal y fondo
-  - Gradiente, fondo transparente y logo central
+  - Gradiente y fondo transparente
   - Nivel de corrección de errores (L, M, Q, H)
 - Exportación en alta calidad:
   - PNG y SVG
