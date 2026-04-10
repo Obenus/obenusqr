@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Download, QrCode, Sparkles } from "lucide-react";
 import { defaultFormValues, defaultStyleConfig } from "@/lib/qr/defaults";
-import { exportQr, mountQr } from "@/lib/qr/exporters";
+import { canLoadLogo, exportQr, mountQr } from "@/lib/qr/exporters";
 import { buildPayload } from "@/lib/qr/payloadBuilders";
 import { stylePresets } from "@/lib/qr/presets";
 import { qrTemplates } from "@/lib/qr/templates";
@@ -36,6 +36,7 @@ export default function HomePage() {
   const [style, setStyle] = useState<QrStyleConfig>(defaultStyleConfig);
   const [exportSize, setExportSize] = useState(2000);
   const [printMode, setPrintMode] = useState(false);
+  const [logoWarning, setLogoWarning] = useState("");
   const [utm, setUtm] = useState<UtmValues>({
     baseUrl: values.link,
     source: "",
@@ -51,8 +52,29 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!previewRef.current) return;
-    previewRef.current.innerHTML = "";
-    mountQr(payload || " ", style, previewRef.current, 420, printMode ? 14 : 2);
+    let cancelled = false;
+    const draw = async () => {
+      if (!previewRef.current) return;
+      previewRef.current.innerHTML = "";
+
+      if (style.centerLogoUrl) {
+        const canUseLogo = await canLoadLogo(style.centerLogoUrl);
+        if (cancelled) return;
+        if (!canUseLogo) {
+          setLogoWarning("No se pudo cargar el logo desde esa URL. El código se muestra sin logo para mantener su lectura.");
+          mountQr(payload || " ", { ...style, centerLogoUrl: "" }, previewRef.current, 420, printMode ? 14 : 2);
+          return;
+        }
+      }
+
+      setLogoWarning("");
+      mountQr(payload || " ", style, previewRef.current, 420, printMode ? 14 : 2);
+    };
+
+    void draw();
+    return () => {
+      cancelled = true;
+    };
   }, [payload, style, printMode]);
 
   const updateValue = (key: keyof QrFormValues, value: string) => setValues((prev) => ({ ...prev, [key]: value }));
@@ -188,6 +210,7 @@ export default function HomePage() {
                   placeholder="https://..."
                   className="mt-1 w-full rounded-lg border border-slate-300 p-2"
                 />
+                {logoWarning ? <span className="mt-1 block text-xs text-amber-700">{logoWarning}</span> : null}
               </label>
               <label className="text-sm">
                 Tamaño de exportación
