@@ -233,12 +233,17 @@ export default function HomePage() {
                 <input
                   type="range"
                   min={60}
-                  max={190}
+                  max={300}
                   step={5}
                   value={Math.round(style.logoScale * 100)}
                   onChange={(e) => setStyle({ ...style, logoScale: Number(e.target.value) / 100 })}
                   className="mt-2 block w-full"
                 />
+                {style.logoScale > 2 ? (
+                  <span className="mt-1 block text-xs text-amber-700">
+                    Tamaños muy altos pueden dificultar el escaneo en algunos lectores.
+                  </span>
+                ) : null}
               </label>
               <label className="text-sm">
                 Tamaño de exportación
